@@ -8,3 +8,10 @@
 # Documentation here: https://yarnpkg.com/features/zero-installs
 !/.yarn/cache
 #/.pnp.*
+.editorconfig
+.idea/
+.pnp.cjs
+.yarn/
+.yarnrc.yml
+node_modules/
+yarn.lock
