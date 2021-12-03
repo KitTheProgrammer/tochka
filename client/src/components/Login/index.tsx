@@ -2,20 +2,20 @@ import React, { useState } from 'react'
 import './styles/styles.css'
 
 export interface LoginProps {
-    onLogin: (userName: string) => void
+    onLogin: (userName: string, password: string) => void
 }
 
 const Login = (props: LoginProps): React.ReactElement => {
     const { onLogin } = props
 
-    const [userName, setUserName] = useState('')
+    const [login, setLogin] = useState('')
     const [password, setPassword] = useState('')
 
     return <div className={'login'}>
         <input
             className={'login__input'}
-            value={userName}
-            onChange={({ target: { value } }) => setUserName(value)}
+            value={login}
+            onChange={({ target: { value } }) => setLogin(value)}
             placeholder={'User name'}
         />
         <input
@@ -24,7 +24,7 @@ const Login = (props: LoginProps): React.ReactElement => {
             onChange={({ target: { value } }) => setPassword(value)}
             placeholder={'Password'}
         />
-        <button className={'login__submit'} onClick={() => onLogin(userName)}>Login</button>
+        <button className={'login__submit'} onClick={() => onLogin(login, password)}>Login</button>
     </div>
 }
 
