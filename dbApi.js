@@ -1,4 +1,5 @@
 const db = require('./database')
+const { as } = require('pg-promise')
 
 const getUserBands = async(userId) => {
     return await db.any(
@@ -41,4 +42,24 @@ const getCalendar = async () => {
         FROM calendar`)
 }
 
-module.exports = { getUserBands, getLogin, getRoles, getBands, getCalendar }
+const getPersonById = async (id) => {
+    return await db.oneOrNone(
+        `SELECT
+            person.id, person.display_name
+        FROM 
+            person
+        WHERE
+            id = ${id}`)
+}
+
+const getEventById = async (id) => {
+    return await db.oneOrNone(
+        `SELECT
+            calendar.id, calendar.blocked, calendar.blocked_by
+        FROM 
+            calendar
+        WHERE
+            id = ${id}`)
+}
+
+module.exports = { getUserBands, getLogin, getRoles, getBands, getCalendar, getEventById, getPersonById }

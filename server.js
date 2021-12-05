@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const { getUserBands, getLogin, getBands, getRoles, getCalendar } = require('./dbApi')
+const { getUserBands, getLogin, getBands, getRoles, getCalendar, getEventById, getPersonById } = require('./dbApi')
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -121,6 +121,78 @@ app.get('/api/calendar', async (req, res) => {
             message: null,
             payload: dbRes,
         })
+    } catch (e) {
+        res.send({
+            error: true,
+            message: `Internal server error: ${e}.\nContact Kit.`,
+            payload: null,
+        })
+    }
+})
+
+app.get('/api/getPerson', async ({ body: { personId } }, res) => {
+    try {
+        if (personId) {
+            const dbRes = getPersonById(personId)
+
+            if (dbRes) {
+                res.send({
+                    error: false,
+                    message: null,
+                    payload: dbRes,
+                })
+            } else {
+                res.send({
+                    error: true,
+                    message: `Internal server error: no such person.\nContact Kit.`,
+                    payload: null,
+                })
+            }
+        } else {
+            res.send({
+                error: true,
+                message: `Request error: no id provided.\nContact Kit.`,
+                payload: null,
+            })
+        }
+    } catch (e) {
+        res.send({
+            error: true,
+            message: `Internal server error: ${e}.\nContact Kit.`,
+            payload: null,
+        })
+    }
+})
+
+app.get('/api/useEvent', async ({ body: { eventId } }, res) => {
+    try {
+         if (eventId) {
+            const dbRes = getEventById(eventId)
+
+             if (dbRes.blocked) {
+                 const personBdRes = await getPersonById(dbRes.blocked_by)
+
+                 if (personBdRes) {
+                     res.send({
+                         error: true,
+                         message: `DB error: this event is currently in use by ${personBdRes.display_name}.\nContact Kit.`,
+                         payload: null,
+                     })
+                 }
+             } else {
+                 res.send({
+                     error: false,
+                     message: null,
+                     payload: dbRes,
+                 })
+             }
+         } else {
+             res.send({
+                 error: true,
+                 message: `Request error: no id provided.\nContact Kit.`,
+                 payload: null,
+             })
+         }
     } catch (e) {
         res.send({
             error: true,
