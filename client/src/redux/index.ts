@@ -1,11 +1,19 @@
 import { configureStore } from '@reduxjs/toolkit'
-import counterReducer from './reducers/counter'
+import rolesReducer from './reducers/roles'
 import loginReducer from './reducers/login'
+import bandsReducer from './reducers/bands'
+import toastReducer from './reducers/toast'
+import eventModalControllerReducer from './reducers/eventModalController'
+import calendarReducer from './reducers/calendar'
 
 export const store = configureStore({
     reducer: {
-        counter: counterReducer,
+        roles: rolesReducer,
         login: loginReducer,
+        bands: bandsReducer,
+        toast: toastReducer,
+        eventModalController: eventModalControllerReducer,
+        calendar: calendarReducer,
     },
 })
 

@@ -1,42 +1,65 @@
 import React, { useCallback, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../hooks'
-import { setUserName } from '../../redux/reducers/login'
+import { setUserInfo, UserInfo } from '../../redux/reducers/login'
+import { getCalendar, getUserBands, loginReq } from '../../api'
 import Login from '../../components/Login'
-import { log } from 'util'
+import { setToast } from '../../redux/reducers/toast'
+import { setCalendar } from '../../redux/reducers/calendar'
+import { CalendarData } from '../../types'
 
 const LoginPage = (): React.ReactElement => {
     const dispatch = useAppDispatch()
     const [redirect, setRedirect] = useState(false)
 
-    const callApi = useCallback(async (login: string, password: string) => {
-        const response = await fetch('/api/login', {
-            method: 'post',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ login, password })
-        });
-        const body = await response.json();
-        if (response.status !== 200) throw Error(body.message);
-
-        return body;
-    }, [])
-
     const onLogin = useCallback(async (login: string, password: string) => {
-        dispatch(setUserName(login))
 
-        const res = await callApi(login, password)
+        const loginRes = await loginReq(login, password)
 
-        console.log(res)
-
-        if (res.error) {
-
+        if (loginRes.error) {
+            dispatch(setToast({ message: loginRes.message, error: true }))
         } else {
-            console.log(res.payload['display_name'].length)
-            setRedirect(true)
+            const userInfo: UserInfo = {
+                name: loginRes.payload?.display_name || null,
+                roleId: loginRes.payload?.role_id || null,
+                id: loginRes.payload?.id || 0,
+                bands: [],
+            }
+
+            const userBandsRes = await getUserBands(userInfo.id)
+
+            if (userBandsRes.error) {
+                dispatch(setToast({ message: loginRes.message, error: true }))
+            } else {
+                const calendarRes = await getCalendar()
+                console.log(calendarRes)
+
+                if (calendarRes.error) {
+                    dispatch(setToast({ message: calendarRes.message, error: true }))
+                } else {
+                    userInfo.bands = userBandsRes.payload
+
+                    if (calendarRes.payload && calendarRes.payload.length) {
+                        const calendarData: CalendarData = {}
+                        calendarRes.payload.forEach((it) => {
+                            if (calendarData[it.date]) {
+                                // @ts-ignore
+                                calendarData[it.date].append(it)
+                            } else {
+                                calendarData[it.date] = [ it ]
+                            }
+                        })
+                        dispatch(setCalendar(calendarData))
+                    }
+
+                    dispatch(setUserInfo(userInfo))
+                    dispatch(setToast({ message: 'Welcome!)', error: false }))
+
+                    setRedirect(true)
+                }
+            }
         }
-    }, [dispatch, setRedirect, callApi])
+    }, [dispatch, setRedirect])
 
     return <>
         {(redirect) ? <Navigate to={'/main'} replace/> : <Login onLogin={onLogin}/>}

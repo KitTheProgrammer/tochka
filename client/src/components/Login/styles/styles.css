@@ -1,4 +1,4 @@
-@keyframes fadeIn {
+@keyframes loginFadeIn {
     0% {opacity:0;}
     100% {opacity:1;}
 }
@@ -6,7 +6,7 @@
 .login {
     display: flex;
     flex-direction: column;
-    background-color: transparent;
+    background-color: #adadad;
     width: 30vw;
     max-width: 500px;
     height: 20vh;
@@ -16,7 +16,7 @@
     box-shadow: 5px 5px 10px 3px #505c5e;
     padding: 6px;
     border-radius: 5px;
-    animation: fadeIn 2s;
+    animation: loginFadeIn 2s;
 }
 
 .login .login__input {

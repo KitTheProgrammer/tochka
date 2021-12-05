@@ -1,11 +1,15 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import MenuBar from '../../components/MenuBar'
+import { useAppSelector } from '../../hooks'
+import MainBody from '../../components/MainBody'
 
 const MainPage = (): React.ReactElement => {
-    return <div>
-        <span>main</span>
-        <Link to={'/login'}>to login</Link>
-    </div>
+    const userInfo = useAppSelector(({ login }) => login.userInfo)
+
+    return <>
+        <MenuBar userInfo={userInfo}/>
+        <MainBody/>
+    </>
 }
 
 export default MainPage

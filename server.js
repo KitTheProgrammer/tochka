@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const { getUserBands, getLogin, getBands, getRoles } = require('./dbApi')
+const { getUserBands, getLogin, getBands, getRoles, getCalendar } = require('./dbApi')
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -12,37 +12,121 @@ app.get('/api/hello', (req, res) => {
     res.send({ express: 'Hello From Express' })
 })
 
-app.post('/api/world', (req, res) => {
-    console.log(req.body);
-    res.send(
-        `I received your POST request. This is what you sent me: ${req.body.post}`,
-    )
+app.get('/api/roles', async (req, res) => {
+    try {
+        const dbRes = await getRoles()
+        res.send({
+            error: false,
+            message: null,
+            payload: dbRes,
+        })
+    } catch (e) {
+        res.send({
+            error: true,
+            message: `Internal server error: ${e}.\nContact Kit.`,
+            payload: null,
+        })
+    }
+})
+
+app.get('/api/bands', async (req, res) => {
+    try {
+        const dbRes = await getBands()
+        res.send({
+            error: false,
+            message: null,
+            payload: dbRes,
+        })
+    } catch (e) {
+        res.send({
+            error: true,
+            message: `Internal server error: ${e}.\nContact Kit.`,
+            payload: null,
+        })
+    }
 })
 
 app.post('/api/login', async ({ body }, res) => {
-    if (body) {
-        const { login, password } = body
-        if (login && password) {
-            const dbRes = await getLogin(login, password)
+    try {
+        if (body) {
+            const { login, password } = body
+            if (login && password) {
+                const dbRes = await getLogin(login, password)
 
-            if (dbRes) {
-                res.send({
-                    error: false,
-                    message: null,
-                    payload: dbRes
-                })
+                if (dbRes) {
+                    res.send({
+                        error: false,
+                        message: null,
+                        payload: dbRes,
+                    })
+                } else {
+                    res.send({
+                        error: true,
+                        message: 'Login and/or password are incorrect!\nContact Kit if you think it is wrong.',
+                        payload: null,
+                    })
+                }
             } else {
                 res.send({
                     error: true,
-                    message: 'Login and/or password are incorrect!',
+                    message: 'Provide login and password!',
+                    payload: null,
                 })
             }
-        } else {
-            res.send({
-                error: true,
-                message: 'Provide login and password!',
-            })
         }
+    } catch (e) {
+        res.send({
+            error: true,
+            message: `Internal server error: ${e}.\nContact Kit.`,
+            payload: null,
+        })
+    }
+})
+
+app.post('/api/userBands', async ({ body }, res) => {
+    try {
+        const { userId } = body
+
+        if (userId) {
+            const dbRes = await getUserBands(userId)
+
+            if (!dbRes) {
+                res.send({
+                    error: true,
+                    message: `Something went wrong.(((\nContact Kit.`
+                })
+            } else {
+                res.send({
+                    error: false,
+                    message: null,
+                    payload: dbRes,
+                })
+            }
+        }
+    } catch (e) {
+        res.send({
+            error: true,
+            message: `Internal server error: ${e}.\nContact Kit.`,
+            payload: null,
+        })
+    }
+})
+
+app.get('/api/calendar', async (req, res) => {
+    try {
+        const dbRes = await getCalendar()
+
+        res.send({
+            error: false,
+            message: null,
+            payload: dbRes,
+        })
+    } catch (e) {
+        res.send({
+            error: true,
+            message: `Internal server error: ${e}.\nContact Kit.`,
+            payload: null,
+        })
     }
 })
 

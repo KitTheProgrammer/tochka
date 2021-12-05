@@ -1,0 +1,28 @@
+@keyframes toastFadeIn {
+    0% {opacity:0; margin-top: -1vh;}
+    100% {opacity:1; margin-top: 1vh;}
+}
+
+.toast {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    margin-left: auto;
+    margin-top: 1vh;
+    border: 1px solid black;
+    border-radius: 5px;
+    min-width: 20vw;
+    min-height: 3rem;
+    background-color: rgba(0, 255, 255, 0.5);
+    padding: 0 5px 0 5px;
+    animation: toastFadeIn 1s;
+}
+
+.toast span {
+    align-self: center;
+}
+
+.error {
+    background-color: rgba(182, 76, 76, 0.5);
+}

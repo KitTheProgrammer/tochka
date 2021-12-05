@@ -32,4 +32,13 @@ const getBands = async () => {
     return await db.many('SELECT * FROM band')
 }
 
-module.exports = { getUserBands, getLogin, getRoles, getBands }
+const getCalendar = async () => {
+    return await db.manyOrNone(
+        `SELECT 
+            calendar.id, calendar.date, calendar.start_at AS "startAt",
+            calendar.end_at AS "endAt", calendar.summary, calendar.color, calendar.created_by,
+            calendar.updated_at, calendar.blocked, calendar.blocked_by
+        FROM calendar`)
+}
+
+module.exports = { getUserBands, getLogin, getRoles, getBands, getCalendar }
