@@ -1,10 +1,10 @@
 const db = require('./database')
-const { as } = require('pg-promise')
+const pgp = require('pg-promise')()
 
 const getUserBands = async(userId) => {
     return await db.any(
     `SELECT 
-        band.id, band.band_name 
+        band.id, band.band_name, band.band_color
     FROM 
         person 
         LEFT JOIN user_bands ON person.id = user_bands.user_id 
@@ -37,9 +37,13 @@ const getCalendar = async () => {
     return await db.manyOrNone(
         `SELECT 
             calendar.id, calendar.date, calendar.start_at AS "startAt",
-            calendar.end_at AS "endAt", calendar.summary, calendar.color, calendar.created_by,
-            calendar.updated_at, calendar.blocked, calendar.blocked_by
-        FROM calendar`)
+            calendar.end_at AS "endAt", calendar.summary, calendar.color, person_1.display_name AS "created_by",
+            calendar.updated_at, calendar.blocked, person_2.display_name AS "blocked_by", calendar.individual,
+            calendar.band_id
+        FROM 
+            calendar
+            INNER JOIN person AS person_1 ON calendar.created_by = person_1.id
+            INNER JOIN person AS person_2 ON calendar.blocked_by = person_2.id`)
 }
 
 const getPersonById = async (id) => {
@@ -55,11 +59,55 @@ const getPersonById = async (id) => {
 const getEventById = async (id) => {
     return await db.oneOrNone(
         `SELECT
-            calendar.id, calendar.blocked, calendar.blocked_by
+            calendar.id, calendar.blocked, person_2.display_name AS "blocked_by",
+            person_1.display_name AS "created_by", updated_at, calendar.blocked_by AS "blocked_by_id",
+            calendar.band_id
         FROM 
             calendar
+            INNER JOIN person AS person_1 ON calendar.created_by = person_1.id
+            INNER JOIN person AS person_2 ON calendar.blocked_by = person_2.id
         WHERE
-            id = ${id}`)
+            calendar.id = ${id}`)
 }
 
-module.exports = { getUserBands, getLogin, getRoles, getBands, getCalendar, getEventById, getPersonById }
+const setEventStatus = async (eventId, status, userId, updatedAt) => {
+    return await db.query(
+        `UPDATE
+            calendar
+        SET
+            blocked = $1, blocked_by = $2, updated_at = $4
+        WHERE
+            id = $3`, [status, userId, eventId, updatedAt])
+}
+
+const updateEvent = async (eventId, startAt, endAt, summary, color, updatedAt, blockedBy, individual, band_id) => {
+    return await db.query(
+        `UPDATE
+            calendar
+        SET
+            start_at = $1, end_at = $2, summary = $3, color = $4, updated_at = $5, blocked = false,
+            blocked_by = $6, individual = $7, band_id = $8
+        WHERE
+            id = $9`, [startAt, endAt, summary, color, updatedAt, blockedBy, individual, band_id, eventId])
+}
+
+const deleteEvent = async (eventId) => {
+    return await db.query(
+        `DELETE FROM
+            calendar
+        WHERE
+            id = $1`, [eventId])
+}
+
+module.exports = {
+    getUserBands,
+    getLogin,
+    getRoles,
+    getBands,
+    getCalendar,
+    getEventById,
+    getPersonById,
+    setEventStatus,
+    updateEvent,
+    deleteEvent,
+}

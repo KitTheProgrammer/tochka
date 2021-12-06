@@ -34,16 +34,19 @@ export interface RoleResponse {
 }
 
 export interface CalendarEvent {
+    id: number
     startAt: string
     endAt: string
     timezoneStartAt?: string
     timezoneEndAt?: string
     summary: string
     color: string
-    created_by: string
-    blocked_by: number
-    updated_at: string
-    blocked: string
+    created_by?: number
+    blocked_by?: number
+    updated_at?: string
+    blocked?: string
+    individual?: boolean
+    band_id?: number
     [key: string]: any
 }
 
@@ -55,4 +58,21 @@ export interface CalendarResponse {
     error: boolean
     message: string | null
     payload: CalendarEvent[] | null
+}
+
+export interface UseEventResponse {
+    error: boolean
+    message: string | null
+    payload: { id: number, blocked: boolean, blocked_by: number }
+}
+
+export interface Person {
+    id: number
+    display_name: string
+}
+
+export interface PersonResponse {
+    error: boolean
+    message: string | null
+    payload: Person | null
 }

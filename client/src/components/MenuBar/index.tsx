@@ -1,20 +1,21 @@
-import React from 'react'
+import React  from 'react'
 import './styles/styles.css'
-import { UserInfo } from '../../redux/reducers/login'
+import { useAppSelector } from '../../hooks'
 
 export interface MenuBarProps {
-    userInfo: UserInfo
-
+    updateCalendar: () => void
 }
 
-const MenuBar = (props: MenuBarProps): React.ReactElement => {
-    const { userInfo } = props
+const MenuBar = ({ updateCalendar }: MenuBarProps): React.ReactElement => {
+    const userInfo = useAppSelector(({ login }) => login.userInfo)
+
     return <div className={'menu-bar'}>
         <div className={'menu-bar__menu-item menu-bar__account'}>
             {userInfo.name}
             {userInfo.roleId}
             {userInfo.bands.map((it) => (<span>{it.band_name};</span>))}
         </div>
+        <div onClick={() => updateCalendar()}>Update calendar</div>
     </div>
 }
 

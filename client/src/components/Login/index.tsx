@@ -11,7 +11,7 @@ const Login = (props: LoginProps): React.ReactElement => {
     const [login, setLogin] = useState('')
     const [password, setPassword] = useState('')
 
-    return <div className={'login'}>
+    return <div className={'login'} onKeyDown={(e) => e.key === 'Enter' && onLogin(login, password)}>
         <input
             className={'login__input'}
             value={login}

@@ -32,7 +32,6 @@ const LoginPage = (): React.ReactElement => {
                 dispatch(setToast({ message: loginRes.message, error: true }))
             } else {
                 const calendarRes = await getCalendar()
-                console.log(calendarRes)
 
                 if (calendarRes.error) {
                     dispatch(setToast({ message: calendarRes.message, error: true }))
@@ -43,8 +42,7 @@ const LoginPage = (): React.ReactElement => {
                         const calendarData: CalendarData = {}
                         calendarRes.payload.forEach((it) => {
                             if (calendarData[it.date]) {
-                                // @ts-ignore
-                                calendarData[it.date].append(it)
+                                calendarData[it.date].push(it)
                             } else {
                                 calendarData[it.date] = [ it ]
                             }

@@ -17,9 +17,97 @@
     flex-direction: column;
     width: 30vw;
     max-width: 500px;
-    height: 20vh;
-    max-height: 300px;
+    height: 50vh;
+    max-height: 600px;
     border: 1px solid #1b2628;
     border-radius: 5px;
     animation: loginFadeIn 2s;
+    font-size: 1.5rem;
+}
+
+.event-modal .event-modal__header {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    min-height: 1.5rem;
+    height: 10%;
+    border-bottom: 1px solid black;
+}
+
+.event-modal .event-modal__header span {
+    margin: 5px;
+}
+
+.event-modal .event-modal__body {
+    display: flex;
+    flex-direction: column;
+    width: calc(100% - 10px);
+    height: 90%;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.event-modal .event-modal__body input {
+    height: 1.5rem;
+    font-size: 1.5rem;
+    border-radius: 5px;
+}
+
+.event-modal .event-modal__footer {
+    display: flex;
+    flex-direction: row;
+}
+
+.event-modal .event-modal__form-button {
+    margin-top: auto;
+    height: 2.5rem;
+    width: 50%;
+    font-size: 1.5rem;
+}
+
+.event-modal .event-modal__submit-button:hover {
+    background-color: rgba(76, 192, 76, 0.69);
+}
+
+.event-modal .event-modal__delete-button:hover {
+    background-color: rgba(231, 106, 106, 0.69);
+}
+
+.event-modal .event-modal__form-block {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 5px;
+}
+
+.event-modal select {
+    margin-left: 10px;
+    font-size: 1.5rem;
+}
+
+.event-modal .event-modal__color-picker {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    background-color: black;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    font-size: 0.8rem;
+    margin-left: 10px;
+}
+
+.event-modal .event-modal__info-block {
+    font-size: 0.8rem;
+    font-style: italic;
+    margin-top: auto;
+}
+
+.event-modal .event-modal__color-picker .event-modal__show-color-picker {
+    display: none;
+    position: absolute;
+}
+
+.event-modal .event-modal__color-picker:hover .event-modal__show-color-picker {
+    display: block;
 }

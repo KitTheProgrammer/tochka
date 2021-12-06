@@ -1,6 +1,6 @@
 @keyframes toastFadeIn {
     0% {opacity:0; margin-top: -1vh;}
-    100% {opacity:1; margin-top: 1vh;}
+    100% {opacity:1; margin-top: 5vh;}
 }
 
 .toast {
@@ -8,8 +8,10 @@
     justify-content: center;
     align-items: center;
     position: absolute;
-    margin-left: auto;
-    margin-top: 1vh;
+    left: 0;
+    top: 0;
+    margin-left: 40%;
+    margin-top: 5vh;
     border: 1px solid black;
     border-radius: 5px;
     min-width: 20vw;
@@ -17,6 +19,7 @@
     background-color: rgba(0, 255, 255, 0.5);
     padding: 0 5px 0 5px;
     animation: toastFadeIn 1s;
+    z-index: 1000;
 }
 
 .toast span {
