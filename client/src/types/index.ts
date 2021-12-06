@@ -41,7 +41,7 @@ export interface CalendarEvent {
     timezoneEndAt?: string
     summary: string
     color: string
-    created_by?: number
+    created_by?: number | string | null
     blocked_by?: number
     updated_at?: string
     blocked?: string

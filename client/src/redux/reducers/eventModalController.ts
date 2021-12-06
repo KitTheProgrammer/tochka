@@ -4,32 +4,29 @@ import { CalendarEvent } from '../../types'
 interface EventModalState {
     showModal: boolean
     eventInfo: CalendarEvent | null
-    new: boolean
+    isNew: boolean
 }
 
 const initialState: EventModalState = {
     showModal: false,
     eventInfo: null,
-    new: false,
+    isNew: false,
 }
 
 export const eventModalControllerSlice = createSlice({
     name: 'eventModalController',
     initialState,
     reducers: {
-        setShowEventModal: (state, action: PayloadAction<boolean>) => {
+        setShowEventModal: (state, action: PayloadAction<{ showModal: boolean, isNew?: boolean }>) => {
             if (!action.payload) {
                 state.eventInfo = null
             }
 
-            state.showModal = action.payload
+            state.showModal = action.payload.showModal
+            if (action.payload.isNew !== undefined) state.isNew = action.payload.isNew
         },
         setEventInfo: (state, action: PayloadAction<CalendarEvent>) => {
             state.eventInfo = action.payload
-            state.new = false
-        },
-        setNewEvent: (state, action) => {
-            state.new = true
         },
         setEventInfoParameter: (state, action: PayloadAction<{ key: keyof CalendarEvent, value: any}>) => {
             if (state.eventInfo) {
