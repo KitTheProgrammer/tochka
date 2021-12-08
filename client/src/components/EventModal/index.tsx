@@ -6,7 +6,7 @@ import { useAppDispatch, useAppSelector } from '../../hooks'
 import { setEventInfoParameter, setShowEventModal } from '../../redux/reducers/eventModalController'
 
 import './styles/styles.css'
-import { deleteEvent, setEventStatus, updateEvent } from '../../api'
+import { createEvent, deleteEvent, setEventStatus, updateEvent } from '../../api'
 import { setToast } from '../../redux/reducers/toast'
 import { setHoursToDate } from '../../utils/helpers'
 
@@ -54,9 +54,17 @@ const EventModal = ({ updateCalendar }: EventModalProps): React.ReactElement => 
         dispatch(setEventInfoParameter({ key, value }))
     }, [dispatch])
 
-    const updateEventPress = useCallback(async () => {
+    const submitEventPress = useCallback(async () => {
         if (isNewEvent) {
-
+            // @ts-ignore
+            const res = await createEvent({ ...eventInfo, created_by: userInfo.id })
+            if (res.error) {
+                dispatch(setToast({ message: res.message, error: true }))
+            } else {
+                dispatch(setShowEventModal({ showModal: false }))
+                dispatch(setToast({ message: res.message, error: false }))
+                updateCalendar()
+            }
         } else {
             // @ts-ignore
             const res = await updateEvent({ ...eventInfo, blocked_by: userInfo.id })
@@ -64,6 +72,7 @@ const EventModal = ({ updateCalendar }: EventModalProps): React.ReactElement => 
                 dispatch(setToast({ message: res.message, error: true }))
             } else {
                 dispatch(setShowEventModal({ showModal: false }))
+                dispatch(setToast({ message: res.message, error: false }))
                 updateCalendar()
             }
         }
@@ -71,7 +80,7 @@ const EventModal = ({ updateCalendar }: EventModalProps): React.ReactElement => 
 
     const deleteEventPress = useCallback(async () => {
         // eslint-disable-next-line no-restricted-globals
-        if (confirm(`Are you sure you want to delete "${eventInfo?.summary}" event?`)) {
+        if (!isNewEvent && confirm(`Are you sure you want to delete "${eventInfo?.summary}" event?`)) {
             const res = await deleteEvent(eventInfo?.id)
             if (res.error) {
                 dispatch(setToast({ message: res.message, error: true }))
@@ -80,7 +89,7 @@ const EventModal = ({ updateCalendar }: EventModalProps): React.ReactElement => 
                 updateCalendar()
             }
         }
-    }, [dispatch, eventInfo?.id, eventInfo?.summary, updateCalendar])
+    }, [dispatch, eventInfo?.id, eventInfo?.summary, updateCalendar, isNewEvent])
 
     return <>
         {(showEventModal) && <div className={'event-modal'}>
@@ -97,8 +106,7 @@ const EventModal = ({ updateCalendar }: EventModalProps): React.ReactElement => 
                         max={23}
                         value={startAt}
                         onChange={({ target: { value } }) => {
-                            !(Number(value) >= endAt)
-                                && handleInputChange('startAt', setHoursToDate(eventInfo?.date, value))
+                            handleInputChange('startAt', setHoursToDate(eventInfo?.date, value))
                         }}
                     />
                     <span>End:</span>
@@ -108,8 +116,7 @@ const EventModal = ({ updateCalendar }: EventModalProps): React.ReactElement => 
                         max={23}
                         value={endAt}
                         onChange={({ target: { value } }) => {
-                            !(Number(value) <= startAt)
-                                && handleInputChange('endAt', setHoursToDate(eventInfo?.date, value))
+                            handleInputChange('endAt', setHoursToDate(eventInfo?.date, value))
                         }}
                     />
                     <span>Event name:</span>
@@ -168,10 +175,13 @@ const EventModal = ({ updateCalendar }: EventModalProps): React.ReactElement => 
                         </div>
                         : <select
                             style={{ backgroundColor: eventInfo?.color }}
-                            value={eventInfo?.color}
+                            value={eventInfo?.band_id}
                             onChange={({ target: { value } }) => {
                                 // @ts-ignore
-                                const { band_color, id } = bands.find((it) => it.id === Number(value))
+                                const { band_color, id, band_name } = bands.find((it) => it.id === Number(value))
+                                if (useName) {
+                                    handleInputChange('summary', band_name)
+                                }
                                 handleInputChange('color', band_color)
                                 handleInputChange('band_id', id)
                             }}
@@ -186,6 +196,15 @@ const EventModal = ({ updateCalendar }: EventModalProps): React.ReactElement => 
                             })}
                         </select>}
                     </div>
+                    {isNewEvent && <div className={'event-modal__form-block'}>
+                        Repeat (for 4 weeks):
+                        <input
+                            type={'checkbox'}
+                            name={'repeat'}
+                            checked={eventInfo?.repeat}
+                            onChange={() => handleInputChange('repeat', !eventInfo?.repeat)}
+                        />
+                    </div>}
                     <div className={'event-modal__info-block'}>
                         <div>Created by: {eventInfo?.created_by}; </div>
                         <div>{eventInfo?.blocked_by && `Last updated by: ${eventInfo?.blocked_by};`} </div>
@@ -198,7 +217,7 @@ const EventModal = ({ updateCalendar }: EventModalProps): React.ReactElement => 
                 <div className={'event-modal__footer'}>
                     <button
                         className={'event-modal__submit-button event-modal__form-button'}
-                        onClick={updateEventPress}
+                        onClick={submitEventPress}
                     >
                         {(isNewEvent) ? 'Create' : 'Update'}
                     </button>

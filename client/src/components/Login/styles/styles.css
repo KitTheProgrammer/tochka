@@ -8,9 +8,7 @@
     flex-direction: column;
     background-color: #adadad;
     width: 30vw;
-    max-width: 500px;
     height: 20vh;
-    max-height: 300px;
     align-self: center;
     border: 1px solid #1b2628;
     box-shadow: 5px 5px 10px 3px #505c5e;
@@ -42,4 +40,11 @@
 
 .login .login__submit:hover {
     background-color: #b4b4b4;
+}
+
+@media only screen and (max-width: 768px) {
+    .login {
+        width: 90%;
+        height: 50%;
+    }
 }

@@ -43,7 +43,8 @@ const getCalendar = async () => {
         FROM 
             calendar
             INNER JOIN person AS person_1 ON calendar.created_by = person_1.id
-            INNER JOIN person AS person_2 ON calendar.blocked_by = person_2.id`)
+            INNER JOIN person AS person_2 ON calendar.blocked_by = person_2.id`
+    )
 }
 
 const getPersonById = async (id) => {
@@ -53,7 +54,8 @@ const getPersonById = async (id) => {
         FROM 
             person
         WHERE
-            id = ${id}`)
+            id = ${id}`
+    )
 }
 
 const getEventById = async (id) => {
@@ -61,13 +63,25 @@ const getEventById = async (id) => {
         `SELECT
             calendar.id, calendar.blocked, person_2.display_name AS "blocked_by",
             person_1.display_name AS "created_by", updated_at, calendar.blocked_by AS "blocked_by_id",
-            calendar.band_id
+            calendar.band_id, calendar.individual, calendar.created_by AS "created_by_id"
         FROM 
             calendar
             INNER JOIN person AS person_1 ON calendar.created_by = person_1.id
             INNER JOIN person AS person_2 ON calendar.blocked_by = person_2.id
         WHERE
-            calendar.id = ${id}`)
+            calendar.id = ${id}`
+    )
+}
+
+const getEventsByDate = async (date) => {
+    return await db.manyOrNone(
+        `SELECT
+            calendar.id, calendar.summary, calendar.start_at, calendar.end_at
+        FROM 
+            calendar
+        WHERE
+            calendar.date = '${date}'`
+    )
 }
 
 const setEventStatus = async (eventId, status, userId, updatedAt) => {
@@ -77,7 +91,9 @@ const setEventStatus = async (eventId, status, userId, updatedAt) => {
         SET
             blocked = $1, blocked_by = $2, updated_at = $4
         WHERE
-            id = $3`, [status, userId, eventId, updatedAt])
+            id = $3`,
+        [status, userId, eventId, updatedAt]
+    )
 }
 
 const updateEvent = async (eventId, startAt, endAt, summary, color, updatedAt, blockedBy, individual, band_id) => {
@@ -88,7 +104,9 @@ const updateEvent = async (eventId, startAt, endAt, summary, color, updatedAt, b
             start_at = $1, end_at = $2, summary = $3, color = $4, updated_at = $5, blocked = false,
             blocked_by = $6, individual = $7, band_id = $8
         WHERE
-            id = $9`, [startAt, endAt, summary, color, updatedAt, blockedBy, individual, band_id, eventId])
+            id = $9`,
+        [startAt, endAt, summary, color, updatedAt, blockedBy, individual, band_id, eventId]
+    )
 }
 
 const deleteEvent = async (eventId) => {
@@ -97,6 +115,24 @@ const deleteEvent = async (eventId) => {
             calendar
         WHERE
             id = $1`, [eventId])
+}
+
+const createEvent = async (date, startAt, endAt, summary, color, created_by, updated_at, individual, band_id) => {
+    return await db.query(
+        `INSERT INTO 
+            calendar (date, start_at, end_at, summary, color, created_by, updated_at, blocked, blocked_by, individual, band_id)
+        VALUES
+            ($1, $2, $3, $4, $5, $6, $7, false, $6, $8, $9)`,
+        [date, startAt, endAt, summary, color, created_by, updated_at, individual, band_id]
+    )
+}
+
+const getUserPassword = async (userId) => {
+    return await db.oneOrNone(`SELECT password FROM person WHERE id = ${userId}`)
+}
+
+const updateUserPassword = async (userId, password) => {
+    return await db.query(`UPDATE person SET password = ${password} WHERE id = ${userId}`)
 }
 
 module.exports = {
@@ -110,4 +146,8 @@ module.exports = {
     setEventStatus,
     updateEvent,
     deleteEvent,
+    createEvent,
+    getEventsByDate,
+    getUserPassword,
+    updateUserPassword,
 }

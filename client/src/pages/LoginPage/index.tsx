@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../hooks'
 import { setUserInfo, UserInfo } from '../../redux/reducers/login'
@@ -52,12 +52,20 @@ const LoginPage = (): React.ReactElement => {
 
                     dispatch(setUserInfo(userInfo))
                     dispatch(setToast({ message: 'Welcome!)', error: false }))
+                    localStorage.setItem('loginInfo', JSON.stringify({ login, password }))
 
                     setRedirect(true)
                 }
             }
         }
     }, [dispatch, setRedirect])
+
+    useEffect(() => {
+        const loginInfo = JSON.parse(localStorage.getItem('loginInfo') || 'null')
+        if (loginInfo) {
+            onLogin(loginInfo.login, loginInfo.password)
+        }
+    }, [onLogin])
 
     return <>
         {(redirect) ? <Navigate to={'/main'} replace/> : <Login onLogin={onLogin}/>}

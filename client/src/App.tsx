@@ -6,6 +6,8 @@ import { setRoles } from './redux/reducers/roles'
 import { setBands } from './redux/reducers/bands'
 
 import './App.css'
+import '@fortawesome/fontawesome-free/css/all.css'
+
 import Toast from './components/Toast'
 
 function App() {

@@ -34,7 +34,8 @@ const MainBody = ({ updateCalendar }: MainBodyProps): React.ReactElement => {
             if (setEventStatusRes.error) {
                 dispatch(setToast({ message: setEventStatusRes.message, error: true }))
             } else {
-                dispatch(setEventInfo(event))
+                console.log(event)
+                dispatch(setEventInfo({ ...event, date: event.date.split('-').reverse().join('-') + 'T00:00:00.000Z' }))
                 dispatch(setShowEventModal({ showModal: true, isNew: false }))
             }
         }
@@ -44,6 +45,7 @@ const MainBody = ({ updateCalendar }: MainBodyProps): React.ReactElement => {
         if (Number(event.hour.toFixed(0)) === 23) {
             dispatch(setToast({ message: 'Can\'t create event at 23:00, sorry((((', error: true }))
         } else {
+            console.log(event.day.toISOString())
             const startAt = setHoursToDate(event.day.toISOString(), event.hour.toFixed(0))
             const endAt = setHoursToDate(event.day.toISOString(), Number(event.hour.toFixed(0)) + 1)
             const summary = 'New Event'
@@ -51,15 +53,14 @@ const MainBody = ({ updateCalendar }: MainBodyProps): React.ReactElement => {
             const created_by = currUserName
             const individual = true
             const eventInfo = {
-                startAt, endAt, summary, color, created_by, individual, id: 10000000000,
-                date: event.day.toISOString().split('T')[0].split('-').reverse().join('-')
+                startAt, endAt, summary, color, created_by, individual, id: new Date().getTime(),
+                date: event.day.toISOString(),
+                repeat: false,
             }
             dispatch(setEventInfo(eventInfo))
             dispatch(setShowEventModal({ showModal: true, isNew: true }))
         }
-    }, [dispatch])
-
-    console.log(calendarData)
+    }, [currUserName, dispatch])
 
     return <div className={'main-body'}>
         <EventModal updateCalendar={updateCalendar}/>
@@ -69,11 +70,9 @@ const MainBody = ({ updateCalendar }: MainBodyProps): React.ReactElement => {
             hourHeight={60}
             events={calendarData}
             onNewEventClick={(e) => {
-                console.log('newEvent', e)
                 onNewEventClick(e)
             }}
             onEventClick={(e) => {
-                console.log('oldEvent', e)
                 onEventClick(e).catch((e) => dispatch(setToast({ message: `Error on event click: ${e}`, error: true })))
             }}
         />

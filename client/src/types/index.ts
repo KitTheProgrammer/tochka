@@ -47,6 +47,7 @@ export interface CalendarEvent {
     blocked?: string
     individual?: boolean
     band_id?: number
+    repeat?: boolean
     [key: string]: any
 }
 

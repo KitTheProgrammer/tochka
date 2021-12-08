@@ -15,21 +15,21 @@
     display: flex;
     background-color: white;
     flex-direction: column;
-    width: 30vw;
+    width: 40vw;
     max-width: 500px;
     height: 50vh;
     max-height: 600px;
     border: 1px solid #1b2628;
     border-radius: 5px;
     animation: loginFadeIn 2s;
-    font-size: 1.5rem;
+    font-size: 2vh;
 }
 
 .event-modal .event-modal__header {
     display: flex;
     width: 100%;
     justify-content: space-between;
-    min-height: 1.5rem;
+    min-height: 2vh;
     height: 10%;
     border-bottom: 1px solid black;
 }
@@ -48,8 +48,8 @@
 }
 
 .event-modal .event-modal__body input {
-    height: 1.5rem;
-    font-size: 1.5rem;
+    height: 2vh;
+    font-size: 2vh;
     border-radius: 5px;
 }
 
@@ -60,9 +60,10 @@
 
 .event-modal .event-modal__form-button {
     margin-top: auto;
-    height: 2.5rem;
-    width: 50%;
-    font-size: 1.5rem;
+    height: 5vh;
+    font-size: 2vh;
+    cursor: pointer;
+    flex-grow: 1;
 }
 
 .event-modal .event-modal__submit-button:hover {
@@ -82,7 +83,7 @@
 
 .event-modal select {
     margin-left: 10px;
-    font-size: 1.5rem;
+    font-size: 2vh;
 }
 
 .event-modal .event-modal__color-picker {
@@ -110,4 +111,11 @@
 
 .event-modal .event-modal__color-picker:hover .event-modal__show-color-picker {
     display: block;
+}
+
+@media only screen and (max-width: 768px) {
+    .event-modal .event-modal__modal-inner {
+        width: 90%;
+        height: 90%;
+    }
 }

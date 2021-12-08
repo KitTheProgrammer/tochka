@@ -67,3 +67,15 @@ export const deleteEvent = async (eventId?: number) => {
 
     return await response.json()
 }
+
+export const createEvent = async (data: CalendarEvent | null) => {
+    const response = await post('createEvent', data)
+
+    return await response.json()
+}
+
+export const changePassword = async (userId: number, oldPass: string, newPass: string) => {
+    const response = await post('changePassword', { userId, oldPass, newPass })
+
+    return await response.json()
+}

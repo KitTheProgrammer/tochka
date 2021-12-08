@@ -8,8 +8,9 @@ const {
     getCalendar,
     getEventById,
     getPersonById,
-    setEventStatus, updateEvent, deleteEvent,
+    setEventStatus, updateEvent, deleteEvent, createEvent, getUserPassword, updateUserPassword,
 } = require('./dbApi')
+const { checkEventConflicts } = require('./helpers/helpers')
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -185,19 +186,35 @@ app.post('/api/useEvent', async ({ body: { eventId, userId } }, res) => {
                     payload: null,
                 })
             } else {
-                const userReqBandsRes = await getUserBands(userId)
-                if (userReqBandsRes.some((it) => it.id === dbRes.band_id)) {
-                    res.send({
-                        error: false,
-                        message: null,
-                        payload: dbRes,
-                    })
+                if (dbRes.individual) {
+                    if (dbRes.created_by_id === userId) {
+                        res.send({
+                            error: false,
+                            message: null,
+                            payload: dbRes,
+                        })
+                    } else {
+                        res.send({
+                            error: true,
+                            message: `You are not a creator of this event.\nContact Kit if you think this is wrong.`,
+                            payload: null,
+                        })
+                    }
                 } else {
-                    res.send({
-                        error: true,
-                        message: `You are not a part of this band.\nContact Kit if you think this is wrong.`,
-                        payload: null,
-                    })
+                    const userReqBandsRes = await getUserBands(userId)
+                    if (userReqBandsRes.some((it) => it.id === dbRes.band_id)) {
+                        res.send({
+                            error: false,
+                            message: null,
+                            payload: dbRes,
+                        })
+                    } else {
+                        res.send({
+                            error: true,
+                            message: `You are not a part of this band.\nContact Kit if you think this is wrong.`,
+                            payload: null,
+                        })
+                    }
                 }
             }
         } else {
@@ -256,23 +273,43 @@ app.post('/api/setEventStatus', async ({ body }, res) => {
 
 app.post('/api/updateEvent', async ({ body }, res) => {
     try {
-        const { id, startAt, endAt, summary, color, blocked_by, individual, band_id } = body
-        const updatedAt = new Date().toISOString()
-        console.log(body)
-        const dbRes = await updateEvent(id, startAt, endAt, summary, color, updatedAt, blocked_by, individual, band_id)
+        const { id, startAt, endAt, summary, color, blocked_by, individual, band_id, date } = body
 
-        if (dbRes) {
-            res.send({
-                error: false,
-                message: 'Updated successfully!',
-                payload: dbRes,
-            })
-        } else {
+        if (new Date(endAt).getTime() <= new Date(startAt).getTime()) {
             res.send({
                 error: true,
-                message: `Internal server error at /api/updateEvent.\nContact Kit.`,
+                message: `Invalid event time".\nContact Kit if you think it's wrong.`,
                 payload: null,
             })
+            return
+        }
+
+        const updatedAt = new Date().toISOString()
+        const conflict = await checkEventConflicts(date, startAt, endAt, id)
+
+        if (conflict.isConflict) {
+            res.send({
+                error: true,
+                message: `Conflict with event "${conflict.conflictSummary}".\nContact Kit if you think it's wrong.`,
+                payload: null,
+            })
+        } else {
+            const dbRes = await updateEvent(id, startAt, endAt, summary, color, updatedAt, blocked_by, individual, band_id)
+            console.log(dbRes)
+
+            if (dbRes) {
+                res.send({
+                    error: false,
+                    message: 'Updated successfully!',
+                    payload: dbRes,
+                })
+            } else {
+                res.send({
+                    error: true,
+                    message: `Internal server error at /api/updateEvent.\nContact Kit.`,
+                    payload: null,
+                })
+            }
         }
     } catch (e) {
         console.log(e)
@@ -300,6 +337,136 @@ app.post('/api/deleteEvent', async ({ body }, res) => {
         res.send({
             error: true,
             message: `Internal server error at /api/deleteEvent: ${e}.\nContact Kit.`,
+            payload: null,
+        })
+    }
+})
+
+app.post('/api/createEvent', async ({ body }, res) => {
+    try {
+        const { date, startAt, endAt, summary, color, created_by, individual, band_id, repeat } = body
+        const currDate = new Date().toISOString()
+
+        if (date && startAt && endAt && summary && color && created_by) {
+            if (new Date(endAt).getTime() <= new Date(startAt).getTime()) {
+                res.send({
+                    error: true,
+                    message: `Invalid event time".\nContact Kit if you think it's wrong.`,
+                    payload: null,
+                })
+                return
+            }
+            const conflict = await checkEventConflicts(date, startAt, endAt)
+            if (conflict.isConflict) {
+                res.send({
+                    error: true,
+                    message: `Conflict with event "${conflict.conflictSummary}".\nContact Kit if you think it's wrong.`,
+                    payload: null,
+                })
+            } else {
+                const correctedDate = date.split('T')[0].split('-').reverse().join('-')
+                const dbRes = await createEvent(correctedDate, startAt, endAt, summary, color, created_by, currDate, individual, band_id)
+                if (dbRes) {
+                    res.send({
+                        error: false,
+                        message: 'Created successfully!',
+                        payload: dbRes,
+                    })
+                } else {
+                    console.log(dbRes)
+                    res.send({
+                        error: true,
+                        message: `Internal server error at /api/createEvent.\nContact Kit.`,
+                        payload: null,
+                    })
+                }
+                if (repeat) {
+                    for (let i = 1; i < 4; i++) {
+                        const hoursToAdd = 7 * 24 * i
+
+                        const correctedStartAt = new Date(startAt)
+                        correctedStartAt.setHours(hoursToAdd + correctedStartAt.getHours())
+                        const repStartAt = correctedStartAt.toISOString()
+
+                        const correctedEndAt = new Date(endAt)
+                        correctedEndAt.setHours(hoursToAdd + correctedEndAt.getHours())
+                        const repEndAt = correctedEndAt.toISOString()
+
+                        const correctedDateDate = new Date(correctedDate.split('-').reverse().join('-'))
+                        correctedDateDate.setHours(hoursToAdd + correctedStartAt.getHours())
+                        const repDate = correctedDateDate.toISOString().split('T')[0].split('-').reverse().join('-')
+
+                        await createEvent(repDate, repStartAt, repEndAt, summary + ' (repeated)', color, created_by, currDate, individual, band_id)
+                    }
+                }
+            }
+        } else {
+            res.send({
+                error: true,
+                message: `Request error to /api/createEvent: parameter is missing.\nContact Kit.`,
+                payload: null,
+            })
+        }
+    } catch (e) {
+        console.log(e)
+        res.send({
+            error: true,
+            message: `Internal server error at /api/createEvent: ${e}.\nContact Kit.`,
+            payload: null,
+        })
+    }
+})
+
+app.post('/api/changePassword', async ({ body }, res) => {
+    try {
+        const { userId, oldPass, newPass } = body
+        if (userId && oldPass && newPass) {
+            const userPasswordRes = await getUserPassword(userId)
+
+            if (userPasswordRes) {
+                if (userPasswordRes.password === oldPass) {
+                    const dbRes = await updateUserPassword(userId, newPass)
+
+                    if (dbRes) {
+                        res.send({
+                            error: false,
+                            message: 'Changed successfully!',
+                            payload: dbRes,
+                        })
+                    } else {
+                        console.log(dbRes)
+                        res.send({
+                            error: true,
+                            message: `Internal server error at /api/changePassword.\nContact Kit.`,
+                            payload: null,
+                        })
+                    }
+                } else {
+                    res.send({
+                        error: true,
+                        message: `Request error at /api/changePassword: incorrect password.\nContact Kit if you think this is wrong.`,
+                        payload: null,
+                    })
+                }
+            } else {
+                res.send({
+                    error: true,
+                    message: `Internal server error at /api/changePassword: can't find user.\nContact Kit.`,
+                    payload: null,
+                })
+            }
+        } else {
+            res.send({
+                error: true,
+                message: `Request error to /api/changePassword: parameter is missing.\nContact Kit.`,
+                payload: null,
+            })
+        }
+    } catch (e) {
+        console.log(e)
+        res.send({
+            error: true,
+            message: `Internal server error at /api/changePassword: ${e}.\nContact Kit.`,
             payload: null,
         })
     }
