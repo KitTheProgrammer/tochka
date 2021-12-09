@@ -35,7 +35,12 @@ const MainBody = ({ updateCalendar }: MainBodyProps): React.ReactElement => {
                 dispatch(setToast({ message: setEventStatusRes.message, error: true }))
             } else {
                 console.log(event)
-                dispatch(setEventInfo({ ...event, date: event.date.split('-').reverse().join('-') + 'T00:00:00.000Z' }))
+                dispatch(setEventInfo({
+                    ...event,
+                    date: event.date.split('-').reverse().join('-') + 'T00:00:00.000Z',
+                    startAt: new Date(event.startAt || 0).getHours() + '',
+                    endAt: new Date(event.endAt || 0).getHours() + '',
+                }))
                 dispatch(setShowEventModal({ showModal: true, isNew: false }))
             }
         }
@@ -46,8 +51,8 @@ const MainBody = ({ updateCalendar }: MainBodyProps): React.ReactElement => {
             dispatch(setToast({ message: 'Can\'t create event at 23:00, sorry((((', error: true }))
         } else {
             console.log(event.day.toISOString())
-            const startAt = setHoursToDate(event.day.toISOString(), event.hour.toFixed(0))
-            const endAt = setHoursToDate(event.day.toISOString(), Number(event.hour.toFixed(0)) + 1)
+            const startAt = event.hour.toFixed(0) + ''
+            const endAt = Number(event.hour.toFixed(0)) + 1 + ''
             const summary = 'New Event'
             const color = 'black'
             const created_by = currUserName

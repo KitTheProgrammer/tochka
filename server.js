@@ -348,15 +348,16 @@ app.post('/api/createEvent', async ({ body }, res) => {
         const currDate = new Date().toISOString()
 
         if (date && startAt && endAt && summary && color && created_by) {
+            const correctedDate = date.split('T')[0].split('-').reverse().join('-')
             if (new Date(endAt).getTime() <= new Date(startAt).getTime()) {
                 res.send({
                     error: true,
-                    message: `Invalid event time".\nContact Kit if you think it's wrong.`,
+                    message: `Invalid event time.\nContact Kit if you think it's wrong.`,
                     payload: null,
                 })
                 return
             }
-            const conflict = await checkEventConflicts(date, startAt, endAt)
+            const conflict = await checkEventConflicts(correctedDate, startAt, endAt)
             if (conflict.isConflict) {
                 res.send({
                     error: true,
@@ -364,7 +365,6 @@ app.post('/api/createEvent', async ({ body }, res) => {
                     payload: null,
                 })
             } else {
-                const correctedDate = date.split('T')[0].split('-').reverse().join('-')
                 const dbRes = await createEvent(correctedDate, startAt, endAt, summary, color, created_by, currDate, individual, band_id)
                 if (dbRes) {
                     res.send({

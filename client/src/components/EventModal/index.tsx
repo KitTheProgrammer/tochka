@@ -26,14 +26,6 @@ const EventModal = ({ updateCalendar }: EventModalProps): React.ReactElement => 
 
     const [useName, setUseName] = useState(false)
 
-    const startAt = useMemo(() => {
-        return new Date(eventInfo?.startAt || 0).getHours()
-    }, [eventInfo?.startAt])
-
-    const endAt = useMemo(() => {
-        return new Date(eventInfo?.endAt || 0).getHours()
-    }, [eventInfo?.endAt])
-
     const closeModal = useCallback(async () => {
         if (isNewEvent) {
             // eslint-disable-next-line no-restricted-globals
@@ -55,9 +47,25 @@ const EventModal = ({ updateCalendar }: EventModalProps): React.ReactElement => 
     }, [dispatch])
 
     const submitEventPress = useCallback(async () => {
+        if (new RegExp('[^0-9]').test(eventInfo?.startAt || 'a') ||
+            new RegExp('[^0-9]').test(eventInfo?.endAt || 'a')) {
+            dispatch(setToast({ message: 'Invalid input for event time', error: true }))
+            return
+        }
         if (isNewEvent) {
+            console.log({
+                ...eventInfo,
+                created_by: userInfo.id,
+                startAt: setHoursToDate(eventInfo?.date, eventInfo?.startAt || 0),
+                endAt: setHoursToDate(eventInfo?.date, eventInfo?.endAt === '24' ? '23' : eventInfo?.endAt || 0, eventInfo?.endAt === '24'),
+            })
             // @ts-ignore
-            const res = await createEvent({ ...eventInfo, created_by: userInfo.id })
+            const res = await createEvent({
+                ...eventInfo,
+                created_by: userInfo.id,
+                startAt: setHoursToDate(eventInfo?.date, eventInfo?.startAt || 0),
+                endAt: setHoursToDate(eventInfo?.date, eventInfo?.endAt === '24' ? '23' : eventInfo?.endAt || 0, eventInfo?.endAt === '24'),
+            })
             if (res.error) {
                 dispatch(setToast({ message: res.message, error: true }))
             } else {
@@ -67,7 +75,12 @@ const EventModal = ({ updateCalendar }: EventModalProps): React.ReactElement => 
             }
         } else {
             // @ts-ignore
-            const res = await updateEvent({ ...eventInfo, blocked_by: userInfo.id })
+            const res = await updateEvent({
+                ...eventInfo,
+                blocked_by: userInfo.id,
+                startAt: setHoursToDate(eventInfo?.date, eventInfo?.startAt || 0),
+                endAt: setHoursToDate(eventInfo?.date, eventInfo?.endAt === '24' ? '23' : eventInfo?.endAt || 0),
+            })
             if (res.error) {
                 dispatch(setToast({ message: res.message, error: true }))
             } else {
@@ -101,22 +114,24 @@ const EventModal = ({ updateCalendar }: EventModalProps): React.ReactElement => 
                 <div className={'event-modal__body'}>
                     <span>Start:</span>
                     <input
-                        type={'number'}
+                        type={'text'}
                         min={0}
                         max={23}
-                        value={startAt}
+                        pattern="\d*"
+                        value={eventInfo?.startAt || ''}
                         onChange={({ target: { value } }) => {
-                            handleInputChange('startAt', setHoursToDate(eventInfo?.date, value))
+                            const correctedValue = Number(value) < 0 ? '0' : Number(value) > 23 ? '23' : value
+                            handleInputChange('startAt', correctedValue)
                         }}
                     />
                     <span>End:</span>
                     <input
-                        type={'number'}
-                        min={0}
-                        max={23}
-                        value={endAt}
+                        type={'text'}
+                        pattern="\d*"
+                        value={eventInfo?.endAt || ''}
                         onChange={({ target: { value } }) => {
-                            handleInputChange('endAt', setHoursToDate(eventInfo?.date, value))
+                            const correctedValue = Number(value) < 0 ? '0' : Number(value) > 24 ? '24' : value
+                            handleInputChange('endAt', correctedValue)
                         }}
                     />
                     <span>Event name:</span>
