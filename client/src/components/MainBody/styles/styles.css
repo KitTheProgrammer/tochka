@@ -2,3 +2,8 @@
     width: 100%;
     height: 100%
 }
+
+.Calend__DayViewOneDay {
+    background: rgb(0,0,0);
+    background: linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 9%, rgba(255,255,255,1) 35%, rgba(255,255,255,1) 61%, rgba(0,0,0,1) 83%, rgba(0,0,0,1) 100%);
+}
