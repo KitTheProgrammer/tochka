@@ -9,7 +9,7 @@
 }
 
 .Calend__CalendarBodyHours__text {
-    font-size: 1.2em;
+    font-size: 1.2em !important;
 }
 
 .Calend__Event-normal {
