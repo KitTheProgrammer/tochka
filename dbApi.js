@@ -132,7 +132,7 @@ const getUserPassword = async (userId) => {
 }
 
 const updateUserPassword = async (userId, password) => {
-    return await db.query(`UPDATE person SET password = ${password} WHERE id = ${userId}`)
+    return await db.query(`UPDATE person SET password = $1 WHERE id = ${userId}`, [password])
 }
 
 module.exports = {
