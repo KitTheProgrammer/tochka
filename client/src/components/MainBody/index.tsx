@@ -47,24 +47,20 @@ const MainBody = ({ updateCalendar }: MainBodyProps): React.ReactElement => {
     }, [dispatch, currUserId])
 
     const onNewEventClick = useCallback( (event: NewEventClickData) => {
-        if (Number(event.hour.toFixed(0)) === 23) {
-            dispatch(setToast({ message: 'Can\'t create event at 23:00, sorry((((', error: true }))
-        } else {
-            console.log(event.day.toISOString())
-            const startAt = event.hour.toFixed(0) + ''
-            const endAt = Number(event.hour.toFixed(0)) + 1 + ''
-            const summary = 'New Event'
-            const color = 'black'
-            const created_by = currUserName
-            const individual = true
-            const eventInfo = {
-                startAt, endAt, summary, color, created_by, individual, id: new Date().getTime(),
-                date: event.day.toISOString(),
-                repeat: false,
-            }
-            dispatch(setEventInfo(eventInfo))
-            dispatch(setShowEventModal({ showModal: true, isNew: true }))
+        console.log(event.day.toISOString())
+        const startAt = event.hour.toFixed(0) + ''
+        const endAt = Number(event.hour.toFixed(0)) + 1 + ''
+        const summary = 'New Event'
+        const color = 'black'
+        const created_by = currUserName
+        const individual = true
+        const eventInfo = {
+            startAt, endAt, summary, color, created_by, individual, id: new Date().getTime(),
+            date: event.day.toISOString(),
+            repeat: false,
         }
+        dispatch(setEventInfo(eventInfo))
+        dispatch(setShowEventModal({ showModal: true, isNew: true }))
     }, [currUserName, dispatch])
 
     return <div className={'main-body'}>
