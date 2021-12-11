@@ -11,9 +11,9 @@ import LoginPage from '../pages/LoginPage'
 const DefaultRouter = (): React.ReactElement => {
     return <Router>
         <Routes>
-            <Route path={'/login'} element={<LoginPage/>} />
-            <Route path={'/main'} element={<MainPage/>}/>
-            <Route path={'/'} element={<Navigate to={'./login'}/>}/>
+            <Route path={'/login'} element={<LoginPage/>}/>
+            <Route path={'/main/*'} element={<MainPage/>}/>
+            <Route path={'/'} element={<Navigate to={'/login'} replace/>}/>
         </Routes>
     </Router>
 }

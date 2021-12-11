@@ -1,5 +1,9 @@
 import React, { useCallback, useState } from 'react'
-import { Navigate } from 'react-router-dom'
+import {
+    Routes,
+    Route,
+    Navigate,
+} from 'react-router-dom'
 
 import MenuBar from '../../components/MenuBar'
 import { useAppDispatch, useAppSelector } from '../../hooks'
@@ -8,6 +12,8 @@ import { getCalendar } from '../../api'
 import { setToast } from '../../redux/reducers/toast'
 import { CalendarData } from '../../types'
 import { setCalendar } from '../../redux/reducers/calendar'
+import Info from '../../components/Info'
+import Stuff from '../../components/Stuff'
 
 const MainPage = (): React.ReactElement => {
     const dispatch = useAppDispatch()
@@ -48,7 +54,11 @@ const MainPage = (): React.ReactElement => {
 
     return <>
         <MenuBar updateCalendar={updateCalendar}/>
-        <MainBody updateCalendar={updateCalendar}/>
+        <Routes>
+            <Route path={'/stuff'} element={<Stuff/>}/>
+            <Route path={'/info'} element={<Info/>}/>
+            <Route path={'/'} element={<MainBody updateCalendar={updateCalendar}/>}/>
+        </Routes>
     </>
 }
 
