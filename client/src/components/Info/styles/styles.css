@@ -1,0 +1,21 @@
+.info-container {
+    width: 100%;
+    height: calc(100vh - 4rem);
+    overflow: scroll;
+}
+
+.info-container .info-container__center {
+    text-align: center;
+}
+
+.info-container .info-container__italic {
+    font-style: italic;
+}
+
+.info-container h3 {
+    margin-left: 20px
+}
+
+.info-container p {
+    margin-left: 40px
+}

@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import './styles/styles.css'
 import { useAppDispatch, useAppSelector } from '../../hooks'
-import { Navigate } from 'react-router-dom'
+import { Navigate, Link } from 'react-router-dom'
 import { setToast } from '../../redux/reducers/toast'
 import { changePassword } from '../../api'
 
@@ -94,10 +94,18 @@ const MenuBar = ({ updateCalendar }: MenuBarProps): React.ReactElement => {
                 </button>
             </div>
         </div>
-        <div className={'menu-bar__update-calendar'} onClick={() => updateCalendar()} title={'Update calendar'}>
+        <Link to={'/main'} replace className={'menu-bar__menu-item menu-bar__navigation'}>
+            Calendar
+        </Link>
+        <Link to={'/main/info'} replace className={'menu-bar__menu-item menu-bar__navigation'}>
+            Info
+        </Link>
+        <Link to={'/main/stuff'} replace className={'menu-bar__menu-item menu-bar__navigation'}>
+            Stuff
+        </Link>
+        <div className={'menu-bar__menu-item menu-bar__update-calendar'} onClick={() => updateCalendar()} title={'Update calendar'}>
             <i className="fas fa-sync-alt"/>
         </div>
-
     </div>
 }
 
