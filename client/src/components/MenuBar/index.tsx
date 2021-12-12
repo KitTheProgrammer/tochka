@@ -6,10 +6,10 @@ import { setToast } from '../../redux/reducers/toast'
 import { changePassword } from '../../api'
 
 export interface MenuBarProps {
-    updateCalendar: () => void
+    updatePages: () => void
 }
 
-const MenuBar = ({ updateCalendar }: MenuBarProps): React.ReactElement => {
+const MenuBar = ({ updatePages }: MenuBarProps): React.ReactElement => {
     const userInfo = useAppSelector(({ login }) => login.userInfo)
     const dispatch = useAppDispatch()
 
@@ -103,7 +103,7 @@ const MenuBar = ({ updateCalendar }: MenuBarProps): React.ReactElement => {
         <Link to={'/main/stuff'} replace className={'menu-bar__menu-item menu-bar__navigation'}>
             Stuff
         </Link>
-        <div className={'menu-bar__menu-item menu-bar__update-calendar'} onClick={() => updateCalendar()} title={'Update calendar'}>
+        <div className={'menu-bar__menu-item menu-bar__update-calendar'} onClick={updatePages} title={'Update calendar'}>
             <i className="fas fa-sync-alt"/>
         </div>
     </div>

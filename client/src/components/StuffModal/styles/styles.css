@@ -1,0 +1,79 @@
+.stuff-modal {
+    position: absolute;
+    backdrop-filter: blur(5px);
+    z-index: 100;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.stuff-modal .stuff-modal__modal-inner {
+    display: flex;
+    background-color: white;
+    flex-direction: column;
+    width: 40vw;
+    max-width: 500px;
+    height: 50vh;
+    max-height: 600px;
+    border: 1px solid #1b2628;
+    border-radius: 5px;
+    animation: loginFadeIn 2s;
+    font-size: 2vh;
+}
+
+.stuff-modal .stuff-modal_modal-header {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    min-height: 2vh;
+    height: 10%;
+    border-bottom: 1px solid black;
+}
+
+.stuff-modal .stuff-modal__modal-body {
+    display: flex;
+    flex-direction: column;
+    width: calc(100% - 10px);
+    height: 90%;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.stuff-modal .stuff-modal__form-block {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 5px;
+}
+
+.stuff-modal .stuff-modal__footer {
+    display: flex;
+    flex-direction: row;
+}
+
+.stuff-modal .stuff-modal__form-button {
+    margin-top: auto;
+    height: 5vh;
+    font-size: 2vh;
+    cursor: pointer;
+    flex-grow: 1;
+}
+
+.stuff-modal .stuff-modal__submit-button:hover {
+    background-color: rgba(76, 192, 76, 0.69);
+}
+
+.stuff-modal .stuff-modal__delete-button:hover {
+    background-color: rgba(231, 106, 106, 0.69);
+}
+
+@media only screen and (max-width: 768px) {
+    .stuff-modal .stuff-modal__modal-inner {
+        width: 90%;
+        height: 90%;
+    }
+}

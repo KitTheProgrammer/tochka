@@ -5,6 +5,8 @@ import bandsReducer from './reducers/bands'
 import toastReducer from './reducers/toast'
 import eventModalControllerReducer from './reducers/eventModalController'
 import calendarReducer from './reducers/calendar'
+import stuff from './reducers/stuff'
+import stuffModalController from './reducers/stuffModalController'
 
 export const store = configureStore({
     reducer: {
@@ -14,6 +16,8 @@ export const store = configureStore({
         toast: toastReducer,
         eventModalController: eventModalControllerReducer,
         calendar: calendarReducer,
+        stuff: stuff,
+        stuffModalController: stuffModalController,
     },
 })
 

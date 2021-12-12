@@ -70,10 +70,33 @@ export interface UseEventResponse {
 export interface Person {
     id: number
     display_name: string
+    login?: string
 }
 
 export interface PersonResponse {
     error: boolean
     message: string | null
     payload: Person | null
+}
+
+export interface Stuff {
+    id?: number
+    name: string
+    created_by: string
+    created_by_id: number
+    used_by: string[]
+    acceptable_users: string[]
+    available: boolean
+}
+
+export interface StuffResponse {
+    error: boolean,
+    message: string | null
+    payload: Stuff[] | null
+}
+
+export interface AllUsersResponse {
+    error: boolean,
+    message: string | null
+    payload: Person[] | null
 }
