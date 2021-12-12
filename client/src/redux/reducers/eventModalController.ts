@@ -32,7 +32,7 @@ export const eventModalControllerSlice = createSlice({
             if (state.eventInfo) {
                 state.eventInfo[action.payload.key] = action.payload.value
             }
-        }
+        },
     },
 })
 

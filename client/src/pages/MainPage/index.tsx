@@ -8,12 +8,13 @@ import {
 import MenuBar from '../../components/MenuBar'
 import { useAppDispatch, useAppSelector } from '../../hooks'
 import MainBody from '../../components/MainBody'
-import { getCalendar } from '../../api'
+import { getAllStuff, getCalendar } from '../../api'
 import { setToast } from '../../redux/reducers/toast'
 import { CalendarData } from '../../types'
 import { setCalendar } from '../../redux/reducers/calendar'
 import Info from '../../components/Info'
 import Stuff from '../../components/Stuff'
+import { setStuff } from '../../redux/reducers/stuff'
 
 const MainPage = (): React.ReactElement => {
     const dispatch = useAppDispatch()
@@ -44,6 +45,20 @@ const MainPage = (): React.ReactElement => {
         setLoading(false)
     }, [dispatch])
 
+    const updateStuff = useCallback(async () => {
+        const res = await getAllStuff()
+        if (res.error) {
+            dispatch(setToast({ message: res.message, error: true }))
+        } else {
+            dispatch(setStuff(res.payload))
+        }
+    }, [dispatch])
+
+    const updatePages = useCallback(async () => {
+        await updateCalendar()
+        await updateStuff()
+    }, [updateStuff, updateCalendar])
+
     if (!userInfo.name) {
         return <Navigate to={'/login'} replace/>
     }
@@ -53,9 +68,9 @@ const MainPage = (): React.ReactElement => {
     }
 
     return <>
-        <MenuBar updateCalendar={updateCalendar}/>
+        <MenuBar updatePages={updatePages}/>
         <Routes>
-            <Route path={'/stuff'} element={<Stuff/>}/>
+            <Route path={'/stuff'} element={<Stuff updateStuff={updateStuff}/>}/>
             <Route path={'/info'} element={<Info/>}/>
             <Route path={'/'} element={<MainBody updateCalendar={updateCalendar}/>}/>
         </Routes>

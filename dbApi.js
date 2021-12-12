@@ -135,6 +135,66 @@ const updateUserPassword = async (userId, password) => {
     return await db.query(`UPDATE person SET password = $1 WHERE id = ${userId}`, [password])
 }
 
+const getAllStuff = async () => {
+    return await db.many(
+        `SELECT
+            stuff.id, stuff.name, person_1.display_name as "created_by", stuff.used_by, 
+            stuff.acceptable_users, stuff.available, stuff.created_by as "created_by_id"
+        FROM
+            stuff
+            INNER JOIN person AS person_1 ON stuff.created_by = person_1.id`
+    )
+}
+
+const getStuffById = async (stuffId) => {
+    return await db.oneOrNone(
+        `SELECT
+            stuff.id, stuff.name, stuff.created_by, stuff.used_by, stuff.acceptable_users, stuff.available
+        FROM
+            stuff
+        WHERE
+            stuff.id = ${stuffId}`
+    )
+}
+
+const updateStuff = async (stuffId, name, used_by, acceptable_users, available) => {
+    return await db.query(
+        `UPDATE
+            stuff
+        SET
+            name = $1, used_by = $2, acceptable_users = $3, available = $4
+        WHERE
+            id = $5`, [name, used_by, acceptable_users, available, stuffId]
+    )
+}
+
+const createStuff = async (name, created_by, used_by, acceptable_users, available) => {
+    return await db.query(
+        `INSERT INTO
+            stuff (name, created_by, used_by, acceptable_users, available)
+        VALUES
+            ($1, $2, $3, $4, $5)`, [name, created_by, used_by, acceptable_users, available]
+    )
+}
+
+const deleteStuff = async (stuffId) => {
+    return await db.query(
+        `DELETE FROM
+            stuff
+        WHERE
+            id = ${stuffId}`
+    )
+}
+
+const getAllUsers = async () => {
+    return await db.many(
+        `SELECT
+            person.id, person.login, person.display_name
+        FROM
+            person`
+    )
+}
+
 module.exports = {
     getUserBands,
     getLogin,
@@ -150,4 +210,10 @@ module.exports = {
     getEventsByDate,
     getUserPassword,
     updateUserPassword,
+    getAllStuff,
+    getStuffById,
+    updateStuff,
+    createStuff,
+    deleteStuff,
+    getAllUsers,
 }

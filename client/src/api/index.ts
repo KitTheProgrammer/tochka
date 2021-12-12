@@ -1,9 +1,10 @@
 import {
+    AllUsersResponse,
     BandsResponse, CalendarEvent,
     CalendarResponse,
     LoginResponse,
     PersonResponse,
-    RoleResponse,
+    RoleResponse, Stuff, StuffResponse,
     UseEventResponse,
 } from '../types'
 import { post, get } from './helpers'
@@ -76,6 +77,42 @@ export const createEvent = async (data: CalendarEvent | null) => {
 
 export const changePassword = async (userId: number, oldPass: string, newPass: string) => {
     const response = await post('changePassword', { userId, oldPass, newPass })
+
+    return await response.json()
+}
+
+export const getAllStuff = async (): Promise<StuffResponse> => {
+    const response = await get('getAllStuff')
+
+    return await response.json()
+}
+
+export const getStuffById = async (stuffId: number): Promise<StuffResponse> => {
+    const response = await post('getStuffById', { stuffId })
+
+    return await response.json()
+}
+
+export const updateStuff = async (data: Stuff | null): Promise<StuffResponse> => {
+    const response = await post('updateStuff', data || {})
+
+    return await response.json()
+}
+
+export const createStuff = async (data: Stuff | null): Promise<StuffResponse> => {
+    const response = await post('createStuff', data || {})
+
+    return await response.json()
+}
+
+export const deleteStuff = async (stuffId?: number): Promise<StuffResponse> => {
+    const response = await post('deleteStuff', { stuffId })
+
+    return await response.json()
+}
+
+export const getAllUsers = async (): Promise<AllUsersResponse> => {
+    const response = await get('getAllUsers')
 
     return await response.json()
 }

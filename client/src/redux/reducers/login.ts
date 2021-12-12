@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { Band } from '../../types'
+import { Band, Person } from '../../types'
 
 export interface UserInfo {
     id: number
@@ -10,6 +10,7 @@ export interface UserInfo {
 
 interface LoginState {
     userInfo: UserInfo
+    allUsers: Person[]
 }
 
 const initialState: LoginState = {
@@ -19,6 +20,7 @@ const initialState: LoginState = {
         bands: [],
         roleId: null,
     },
+    allUsers: [],
 }
 
 export const loginSlice = createSlice({
@@ -28,9 +30,12 @@ export const loginSlice = createSlice({
         setUserInfo: (state, action: PayloadAction<UserInfo>) => {
             state.userInfo = action.payload
         },
+        setAllUsers: (state, action: PayloadAction<Person[] | null>) => {
+            state.allUsers = action.payload || []
+        }
     },
 })
 
-export const { setUserInfo } = loginSlice.actions
+export const { setUserInfo, setAllUsers } = loginSlice.actions
 
 export default loginSlice.reducer

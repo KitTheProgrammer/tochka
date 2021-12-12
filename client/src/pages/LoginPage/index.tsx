@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../hooks'
-import { setUserInfo, UserInfo } from '../../redux/reducers/login'
-import { getCalendar, getUserBands, loginReq } from '../../api'
+import { setAllUsers, setUserInfo, UserInfo } from '../../redux/reducers/login'
+import { getAllUsers, getCalendar, getUserBands, loginReq } from '../../api'
 import Login from '../../components/Login'
 import { setToast } from '../../redux/reducers/toast'
 import { setCalendar } from '../../redux/reducers/calendar'
@@ -32,6 +32,8 @@ const LoginPage = (): React.ReactElement => {
                 dispatch(setToast({ message: loginRes.message, error: true }))
             } else {
                 const calendarRes = await getCalendar()
+                const allUsers = await getAllUsers()
+                console.log(allUsers)
 
                 if (calendarRes.error) {
                     dispatch(setToast({ message: calendarRes.message, error: true }))
@@ -51,6 +53,7 @@ const LoginPage = (): React.ReactElement => {
                     }
 
                     dispatch(setUserInfo(userInfo))
+                    dispatch(setAllUsers(allUsers.payload))
                     dispatch(setToast({ message: 'Welcome!)', error: false }))
                     localStorage.setItem('loginInfo', JSON.stringify({ login, password }))
 
