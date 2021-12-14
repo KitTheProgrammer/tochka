@@ -11,7 +11,7 @@ import { checkEventUsage, setEventStatus } from '../../api'
 import { CalendarEvent } from '../../types'
 import { setToast } from '../../redux/reducers/toast'
 import { NewEventClickData } from 'calend/common/interface'
-import { setHoursToDate } from '../../utils/helpers'
+import { userInfo } from 'os'
 
 export interface MainBodyProps {
     updateCalendar: () => void
@@ -50,7 +50,7 @@ const MainBody = ({ updateCalendar }: MainBodyProps): React.ReactElement => {
         console.log(event.day.toISOString())
         const startAt = event.hour.toFixed(0) + ''
         const endAt = Number(event.hour.toFixed(0)) + 1 + ''
-        const summary = 'New Event'
+        const summary = currUserName || 'New Event'
         const color = 'black'
         const created_by = currUserName
         const individual = true
@@ -68,7 +68,7 @@ const MainBody = ({ updateCalendar }: MainBodyProps): React.ReactElement => {
         <Calend
             initialView={CALENDAR_VIEW.WEEK}
             initialDate={new Date().toISOString()}
-            hourHeight={60}
+            hourHeight={36}
             events={calendarData}
             onNewEventClick={(e) => {
                 onNewEventClick(e)

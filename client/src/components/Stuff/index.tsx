@@ -46,7 +46,7 @@ export const Stuff = (props: StuffProps): React.ReactElement => {
     return <div className={'stuff-container'}>
         <StuffModal updateStuff={updateStuff}/>
         <div className={'stuff-table'}>
-            <div className={'stuff-table__item stuff-table__header'}>ID</div>
+            <div className={'stuff-table__item stuff-table__header stuff-table__id'}>ID</div>
             <div className={'stuff-table__item stuff-table__header'}>Name</div>
             <div className={'stuff-table__item stuff-table__header'}>Created by</div>
             <div className={'stuff-table__item stuff-table__header'}>Can be used by</div>
