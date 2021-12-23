@@ -1,5 +1,4 @@
 const db = require('./database')
-const pgp = require('pg-promise')()
 
 const getUserBands = async(userId) => {
     return await db.any(
@@ -50,7 +49,7 @@ const getCalendar = async () => {
 const getPersonById = async (id) => {
     return await db.oneOrNone(
         `SELECT
-            person.id, person.display_name
+            person.id, person.display_name, person.tg_tag
         FROM 
             person
         WHERE
@@ -63,7 +62,8 @@ const getEventById = async (id) => {
         `SELECT
             calendar.id, calendar.blocked, person_2.display_name AS "blocked_by",
             person_1.display_name AS "created_by", updated_at, calendar.blocked_by AS "blocked_by_id",
-            calendar.band_id, calendar.individual, calendar.created_by AS "created_by_id"
+            calendar.band_id, calendar.individual, calendar.created_by AS "created_by_id",
+            calendar.summary, calendar.start_at, calendar.end_at, calendar.date
         FROM 
             calendar
             INNER JOIN person AS person_1 ON calendar.created_by = person_1.id
@@ -195,6 +195,32 @@ const getAllUsers = async () => {
     )
 }
 
+const getBandById = async (bandId) => {
+    return await db.oneOrNone(
+        `SELECT
+            band.band_name
+        FROM
+            band
+        WHERE
+            band.id = $1;`,
+        [bandId]
+    )
+}
+
+const getBandUsers = async (bandId) => {
+    return await db.manyOrNone(
+        `SELECT 
+        person.tg_tag
+    FROM 
+        band 
+        LEFT JOIN user_bands ON band.id = user_bands.band_id 
+        LEFT JOIN person ON user_bands.user_id = person.id 
+    WHERE 
+        band.id = $1;`,
+        [bandId]
+    )
+}
+
 module.exports = {
     getUserBands,
     getLogin,
@@ -216,4 +242,6 @@ module.exports = {
     createStuff,
     deleteStuff,
     getAllUsers,
+    getBandById,
+    getBandUsers,
 }

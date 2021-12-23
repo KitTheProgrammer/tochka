@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 // @ts-ignore
 import { SketchPicker } from 'react-color'
 
@@ -94,7 +94,7 @@ const EventModal = ({ updateCalendar }: EventModalProps): React.ReactElement => 
     const deleteEventPress = useCallback(async () => {
         // eslint-disable-next-line no-restricted-globals
         if (!isNewEvent && confirm(`Are you sure you want to delete "${eventInfo?.summary}" event?`)) {
-            const res = await deleteEvent(eventInfo?.id)
+            const res = await deleteEvent(eventInfo?.id, userInfo.id)
             if (res.error) {
                 dispatch(setToast({ message: res.message, error: true }))
             } else {
@@ -102,7 +102,7 @@ const EventModal = ({ updateCalendar }: EventModalProps): React.ReactElement => 
                 updateCalendar()
             }
         }
-    }, [dispatch, eventInfo?.id, eventInfo?.summary, updateCalendar, isNewEvent])
+    }, [isNewEvent, eventInfo?.summary, eventInfo?.id, userInfo.id, dispatch, updateCalendar])
 
     return <>
         {(showEventModal) && <div className={'event-modal'}>

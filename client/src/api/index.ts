@@ -63,8 +63,8 @@ export const updateEvent = async (data: CalendarEvent | null) => {
     return await response.json()
 }
 
-export const deleteEvent = async (eventId?: number) => {
-    const response = await post('deleteEvent', { eventId })
+export const deleteEvent = async (eventId?: number, userId?: number) => {
+    const response = await post('deleteEvent', { eventId, userId })
 
     return await response.json()
 }

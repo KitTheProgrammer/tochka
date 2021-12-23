@@ -9,19 +9,17 @@ const {
     getEventById,
     getPersonById,
     setEventStatus, updateEvent, deleteEvent, createEvent, getUserPassword, updateUserPassword, getAllStuff,
-    getStuffById, updateStuff, deleteStuff, createStuff, getAllUsers,
+    getStuffById, updateStuff, deleteStuff, createStuff, getAllUsers, getBandById, getBandUsers,
 } = require('./dbApi')
 const { checkEventConflicts } = require('./helpers/helpers')
+const bot = require('./tgBot')
 
 const app = express();
 const port = process.env.PORT || 5000;
+const chatId = '-1001629071696'
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-app.get('/api/hello', (req, res) => {
-    res.send({ express: 'Hello From Express' })
-})
 
 app.get('/api/roles', async (req, res) => {
     try {
@@ -295,10 +293,24 @@ app.post('/api/updateEvent', async ({ body }, res) => {
                 payload: null,
             })
         } else {
+            const oldEvent = await getEventById(id)
             const dbRes = await updateEvent(id, startAt, endAt, summary, color, updatedAt, blocked_by, individual, band_id)
-            console.log(dbRes)
 
             if (dbRes) {
+                const userRes = await getPersonById(blocked_by)
+
+                if (userRes) {
+                    const changedSum = (oldEvent.summary === summary) ? `"${summary}"` : `"${oldEvent.summary}" -> "${summary}"`
+                    const changedStartAt = (oldEvent.start_at === startAt) ? `${new Date(startAt).getHours()}:00` : `${new Date(oldEvent.start_at).getHours()}:00 -> ${new Date(startAt).getHours()}:00`
+                    const changedEndAt = (oldEvent.end_at === endAt) ? `${new Date(endAt).getHours()}:00` : `${new Date(oldEvent.end_at).getHours()}:00 -> ${new Date(endAt).getHours()}:00`
+                    const bandUsers = await getBandUsers(oldEvent.band_id)
+                    const notify = (bandUsers.length && !individual) ? '\nРебята, ' + bandUsers.reduce((ac, { tg_tag }) => ac + tg_tag + ' ', '') + 'учтите изменения!' : ''
+
+                    bot.telegram.sendMessage(chatId,
+                        `${userRes.tg_tag} только что изменил ивент ${changedSum}.\nДата: ${new Date(date).toLocaleDateString('ru-RU')}\nНачало: ${changedStartAt}\nКонец: ${changedEndAt}${notify}`
+                    )
+                }
+
                 res.send({
                     error: false,
                     message: 'Updated successfully!',
@@ -324,9 +336,21 @@ app.post('/api/updateEvent', async ({ body }, res) => {
 
 app.post('/api/deleteEvent', async ({ body }, res) => {
     try {
-        const { eventId } = body
+        const { eventId, userId } = body
+
+        const oldEvent = await getEventById(eventId)
+        const userRes = await getPersonById(userId)
 
         const dbRes = await deleteEvent(eventId)
+
+        if (userRes && oldEvent) {
+            const bandUsers = await getBandUsers(oldEvent.band_id)
+            const notify = (bandUsers.length && !oldEvent.individual) ? '\nРебята, ' + bandUsers.reduce((ac, { tg_tag }) => ac + tg_tag + ' ', '') + 'репа отменяется!!!' : ''
+
+            bot.telegram.sendMessage(chatId,
+                `${userRes.tg_tag} только что удалил ивент "${oldEvent.summary}".\nДата: ${oldEvent.date.replace(/-/g, '.')}\nТеперь время с ${new Date(oldEvent.start_at).getHours()}:00 по ${new Date(oldEvent.end_at).getHours()}:00 свободно.${notify}`
+            )
+        }
 
         res.send({
             error: false,
@@ -368,6 +392,19 @@ app.post('/api/createEvent', async ({ body }, res) => {
             } else {
                 const dbRes = await createEvent(correctedDate, startAt, endAt, summary, color, created_by, currDate, individual, band_id)
                 if (dbRes) {
+                    const userRes = await getPersonById(created_by)
+                    const bandName = await getBandById(band_id)
+                    const bandUsers = await getBandUsers(band_id)
+
+                    if (userRes) {
+                        const isRepeatedText = (repeat) ? ' и повторил его на 4 недели вперед' : ''
+                        const isIndividualText = (individual) ? 'индивидуальный' : `групповой (${bandName?.band_name || 'Err'})`
+                        const notify = (bandUsers.length && !individual) ? '\nРебята, ' + bandUsers.reduce((ac, { tg_tag }) => ac + tg_tag + ' ', '') + 'не пропустите репу!' : ''
+
+                        bot.telegram.sendMessage(chatId,
+                            `${userRes.tg_tag} только что создал новый ${isIndividualText} ивент "${summary}"${isRepeatedText}.\nДата: ${new Date(date).toLocaleDateString('ru-RU')}\nНачало: ${new Date(startAt).getHours()}:00\nКонец: ${new Date(endAt).getHours()}:00${notify}`
+                        )
+                    }
                     res.send({
                         error: false,
                         message: 'Created successfully!',
