@@ -31,6 +31,14 @@ const checkEventConflicts = async (date, startAt, endAt, id=null) => {
     return { isConflict: false }
 }
 
+const getDate = (date) => {
+    const day = date.getDate()
+    const month = date.getMonth() + 1
+
+    return `${(day < 10) ? 0 : ''}${day}.${(month < 10) ? 0 : ''}${month}.${date.getFullYear()}`
+}
+
 module.exports = {
-    checkEventConflicts
+    checkEventConflicts,
+    getDate,
 }
