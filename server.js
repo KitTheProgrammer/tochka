@@ -21,6 +21,13 @@ const chatId = '-1001629071696'
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+const getDate = (date) => {
+  const day = date.getDate()
+  const month = date.getMonth() + 1
+
+  return `${(day < 10) ? 0 : ''}${day}.${(month < 10) ? 0 : ''}${month}.${date.getFullYear()}`
+}
+
 app.get('/api/roles', async (req, res) => {
     try {
         const dbRes = await getRoles()
@@ -307,7 +314,7 @@ app.post('/api/updateEvent', async ({ body }, res) => {
                     const notify = (bandUsers.length && !individual) ? '\nРебята, ' + bandUsers.reduce((ac, { tg_tag }) => ac + tg_tag + ' ', '') + 'учтите изменения!' : ''
 
                     bot.telegram.sendMessage(chatId,
-                        `${userRes.tg_tag} только что изменил ивент ${changedSum}.\nДата: ${new Date(date).toLocaleDateString('ru-RU')}\nНачало: ${changedStartAt}\nКонец: ${changedEndAt}${notify}`
+                        `${userRes.tg_tag} только что изменил ивент ${changedSum}.\nДата: ${getDate(new Date(date))}\nНачало: ${changedStartAt}\nКонец: ${changedEndAt}${notify}`
                     )
                 }
 
@@ -398,11 +405,11 @@ app.post('/api/createEvent', async ({ body }, res) => {
 
                     if (userRes) {
                         const isRepeatedText = (repeat) ? ' и повторил его на 4 недели вперед' : ''
-                        const isIndividualText = (individual) ? 'индивидуальный' : `групповой (${bandName?.band_name || 'Err'})`
+                        const isIndividualText = (individual) ? 'индивидуальный' : `групповой (${bandName.band_name || 'Err'})`
                         const notify = (bandUsers.length && !individual) ? '\nРебята, ' + bandUsers.reduce((ac, { tg_tag }) => ac + tg_tag + ' ', '') + 'не пропустите репу!' : ''
 
                         bot.telegram.sendMessage(chatId,
-                            `${userRes.tg_tag} только что создал новый ${isIndividualText} ивент "${summary}"${isRepeatedText}.\nДата: ${new Date(date).toLocaleDateString('ru-RU')}\nНачало: ${new Date(startAt).getHours()}:00\nКонец: ${new Date(endAt).getHours()}:00${notify}`
+                            `${userRes.tg_tag} только что создал новый ${isIndividualText} ивент "${summary}"${isRepeatedText}.\nДата: ${getDate(new Date(date))}\nНачало: ${new Date(startAt).getHours()}:00\nКонец: ${new Date(endAt).getHours()}:00${notify}`
                         )
                     }
                     res.send({
