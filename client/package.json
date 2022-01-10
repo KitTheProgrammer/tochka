@@ -47,5 +47,5 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:5000/"
+  "proxy": "http://tochkaapi-env.eba-2bwt5hmu.eu-central-1.elasticbeanstalk.com/"
 }
