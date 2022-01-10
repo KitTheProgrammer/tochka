@@ -47,5 +47,5 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://tochkaapi-env.eba-2bwt5hmu.eu-central-1.elasticbeanstalk.com/"
+  "proxy": "https://tochkaapi-env.eba-2bwt5hmu.eu-central-1.elasticbeanstalk.com/"
 }
