@@ -7,10 +7,10 @@ import {
     RoleResponse, Stuff, StuffResponse,
     UseEventResponse,
 } from '../types'
-import { post, get } from './helpers'
+import { post, get, put } from './helpers'
 
 export const loginReq = async (login: string, password: string): Promise<LoginResponse> => {
-    const response = await post('login', { login, password })
+    const response = await put('login', { login, password })
 
     return await response.json()
 }

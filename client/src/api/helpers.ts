@@ -19,3 +19,13 @@ export const post = async (endpoint: string, body: any): Promise<any> => {
         body: JSON.stringify(body)
     })
 }
+
+export const put = async (endpoint: string, body: any): Promise<any> => {
+    return await fetch(`${defaultApiEndpoint}/${endpoint}`, {
+        method: 'put',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body)
+    })
+}
